@@ -30,7 +30,7 @@ void merge(int* arr,int l,int m,int r,int k,int* ans){
         if(L[i]>R[j]){
             arr[p++] = R[j++];
         }else{
-             arr[p++]=L[i++];//this i doesnt satisfy condn doesnt satisying for all R[j]
+             arr[p++]=L[i++];
         }
     }
     while(i<m-l+1){
