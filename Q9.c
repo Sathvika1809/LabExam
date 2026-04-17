@@ -27,7 +27,7 @@ int solve(char* seq1,char* seq2,int n,int m){
     for(int j=0;j<=m;j++){
         dp[0][j] = j;
     }
-    //replace seq1[i-1] with seq2[j-1] dp[i-1][j-1]+1
+    //replace - seq1[i-1] with seq2[j-1] dp[i-1][j-1]+1 
     //delete seq1[i-1] then dp[i-1][j]+1
     //insert seq1[i-1] with seq2[j-1] then dp[i][j-1]+1
     for(int i=1;i<=n;i++){
