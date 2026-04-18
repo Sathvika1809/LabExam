@@ -12,27 +12,25 @@ int main(){
         }
     }
     int dp[m][n];
-    for(int i=0;i<n;i++){
-        if(grid[0][i]==1){
-            while(i<n){
-            dp[0][i]=0;
-            i++;
-            }
-            break;
-        }else{
-            dp[0][i] = 1;
-        }  
-    }
     for(int i=0;i<m;i++){
-        if(grid[i][0]==1){
-            while(i<m){
-                dp[i][0] = 0;
-                i++;
-            }
-            break;
+        for(int j=0;j<n;j++){
+            dp[i][j] = 0;
+        }
+    }
+    dp[0][0] = 1;
+    for(int j=1;j<n;j++){
+        if(grid[0][j]==0){
+            dp[0][j] = dp[0][j-1];
         }else{
-           dp[i][0] = 1;
-       }
+            dp[0][j] = 0;
+        }
+    }
+    for(int i=1;i<m;i++){
+        if(grid[i][0]==0){
+            dp[i][0] = dp[i-1][0];
+        }else{
+            dp[i][0] = 0;
+        }
     }
     for(int i=1;i<m;i++){
         for(int j=1;j<n;j++){

@@ -1,110 +1,137 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <math.h>
+typedef long long ll;
 typedef struct Point{
-   int u,v;
-   int type;
+    ll u;
+    ll v;
+    int type;
 }Point;
-int min(int a,int b){
-    return a<b?a:b;
+Point* pts,*temp,*stripArr;
+ll minll(ll a,ll b){
+    return (a<b)?a:b;
 }
-int cmp(Point* a,Point* b){
-    if(a.u < b.u)return -1;
-    if(a.u > b.u)return 1;
-    if(a.v < b.v)return -1;
-    if(a.v > b.v)return 1;
-    return 0;
+ll  maxll(ll a,ll b){
+    return (a>b)?a:b;
 }
-int findAnswer(Point* p1,int size){
-    
-
-}
-void merge(int p1,int l,int mid,int r){
-    int n1 = mid-l+1; int n2 = r-m;
-    Point L[n1],Point R[n2];
-
-    
-
-
-
+ll absll(ll x){
+    return (x<0)?-x:x;
 }
 
-void mergesort(Point* p1,int l,int r){
-    
-    if(l<r){
-        int mid = l+(r-l)/2;
-        mergesort(p1,l,mid);
-        mergesort(p1,mid+1,r);
-        merge(p1,l,mid,r);
-    }
-    return;
 
+long long dist(Point p1,Point p2){
+    return maxll(absll(p1.u-p2.u),absll(p1.v-p2.v));
 }
-int cmp(Point a,Point b){
-    if(a.u < b.u)return 1;
-    else if(a.u == b.u && a.v < b.v){
-        return 1;
-    }
-    return 0;
-}
-void merge(Point* a,int l,int mid,int r ,Point* temp){
-    int i = l,j = mid+1,k=l;
 
-    while(i<=mid && j<=r){
-        if(cmp(a[i],a[j])){
-            temp[k++] = a[i++];
-        }else{
-            temp[k++] = a[j++];
+void swap(Point* a,Point* b){
+    Point t = *a;
+    *a = *b;
+    *b = t;
+}
+void bubblesortU(Point arr[],int n){
+    for(int i=0;i<n-1;i++){
+        for(int j=0;j<n-1-i;j++){
+            if(arr[j].u > arr[j+1].u ||
+            (arr[j].u == arr[j+1].u && arr[j].v > arr[j+1].v)){
+                swap(&arr[j],&arr[j+1]);
+            }
         }
-    while(i<=mid)temp[k++] = a[i++];
-    while(j<=r)temp[k++] = a[j++];
+    }
+}
+void bubblesortV(int l,int r){
+    for(int i=l;i<r;i++){
+        for(int j=l;j<r-(i-l);j++){
+            if(pts[j].v > pts[j+1].v){
+                swap(&pts[j],&pts[j+1]);
+            }
+        }
+    }
+}
+void mergeByV(int l,int mid,int r){
+    int i=l,j=mid+1,k=l;
+    while(i<=mid && j<=r){
+        if(pts[i].v <= pts[j].v){
+            temp[k++] = pts[i++];
+        }else{
+            temp[k++] = pts[j++];
+        }
+    }
+    while(i<=mid)temp[k++] = pts[i++];
+    while(j<=r)temp[k++] = pts[j++];
+
+    for(i=l;i<=r;i++){
+        pts[i] = temp[i];
+    }
+}
+ll solve(int l,int r){
+    if(r-l<=3){
+        ll ans = LLONG_MAX;
+        for(int i=l;i<=r;i++){
+            for(int j=i+1;j<=r;j++){
+                if(pts[i].type != pts[j].type){
+                    ll d = dist(pts[i],pts[j]);
+                    if(d<ans)ans = d;
+                }
+            }
+        }
+        bubblesortV(l,r);
+        return ans;
+    }
+    int mid = (l+(r-l)/2);
+    ll  midU = pts[mid].u;
+
+    ll leftAns = solve(l,mid);
+    ll rightAns = solve(mid+1,r);
+    ll d = minll(leftAns,rightAns);
+
+    mergeByV(l,mid,r);
+    int sz = 0;
     for(int i=l;i<=r;i++){
-        a[i] = temp[i];
+        if(absll(pts[i].u -midU)<d){
+            stripArr[sz++] = pts[i];
+        }
     }
-
-
+    for(int i=0;i<sz;i++){
+        for(int j=i+1;j<sz&&(stripArr[j].v - stripArr[i].v)< d && j<=i+8;j++){
+            if(stripArr[i].type != stripArr[j].type){
+                ll cur = dist(stripArr[i],stripArr[j]);
+                if(cur<d){
+                    d = cur;
+                }
+            }
+        }
     }
-
-
-
-
-
+    return d;
 }
 
-
-
-void mergesort(Point* a,int l,int r,Point* temp){
-    if(l>=r)return;
-
-    int mid = l+(r-l)/2;
-    mergesort(a,l,mid,temp);
-    mergesort(a,mid+1,r,temp);
-    merge(a,l,mid,r,temp);
-}
 int main(){
     int n,m;
     scanf("%d %d",&n,&m);
     int tot = n+m;
-    Point* p1 = (Point*)malloc(tot*sizeof(Point));
-    Point* temp = (Point*)malloc(tot*sizeof(Point));
+    pts = malloc(tot*sizeof(Point));
+    temp = (Point *)malloc(tot* sizeof(Point));
+    stripArr = (Point *)malloc(tot * sizeof(Point));
 
     for(int i=0;i<n;i++){
-        int x,y;
-        scanf("%d %d",&x,&y);
-        p1[i].u = x+y;
-        p1[i].v = x-y;
-        p1[i].type = 0;
+        ll x,y;
+       scanf("%lld %lld", &x, &y);
+        pts[i].u = x + y;
+        pts[i].v = x - y;
+        pts[i].type = 0;
     }
-    for(int i=0;i<m;i++){
-        int x,y;
-        scanf("%d %d",&x,&y);
-        int u1 = x+y;
-        int v1 = x-y;
-        p1[n+i].u = u1;
-        p1[n+i].v = v1;
-        p1[n+i].type = 1;
+    for(int i=n;i<tot;i++){
+        ll x,y;
+        scanf("%lld %lld", &x, &y);
+        pts[ i].u = x + y;
+        pts[ i].v = x - y;
+        pts[i].type = 1;
     }
-    mergesort(p1,0,tot-1,temp);
-
-    printf("%d\n",findAnswer(p1,n+m));
+    bubblesortU(pts,tot);
+    ll ans = solve(0,tot-1);
+    printf("%lld",ans);
+    free(pts);
+    free(temp);
+    free(stripArr);
     return 0;
 }

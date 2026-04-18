@@ -9,12 +9,12 @@ void swap(int* a,int* b){
 void merge(int* arr,int l,int m,int r,int k,int* ans){
 
     //count rev pairs
-    int aa = m+1;
+    int p = m+1;
     for(int i=l;i<=m;i++){
-        while(aa<=r && (long long)arr[i]>k*(long long)arr[aa]){
-            aa++;
+        while(p<=r && (long long)arr[i]>k*(long long)arr[p]){
+            p++;
         }
-        *ans +=(aa-(m+1));
+        *ans +=(p-(m+1));
     }
 
     int L[m-l+1];

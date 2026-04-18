@@ -10,7 +10,7 @@ int findSubsequence(char* source,char* target,int n,int m,int dp[n+1][m+1]){
     for(int i=1;i<=n;i++){
         for(int j=1;j<=m;j++){
             if(source[i-1]==target[j-1]){
-                dp[i][j] = dp[i-1][j-1]+dp[i-1][j];
+                dp[i][j] = dp[i-1][j-1]+dp[i-1][j]; //take+nottake
             }else{
                 dp[i][j] = dp[i-1][j];
             }
@@ -19,12 +19,28 @@ int findSubsequence(char* source,char* target,int n,int m,int dp[n+1][m+1]){
     return dp[n][m];
 }
 
+int findAnswer(char* source,char* target,int n,int m,int dp[n+1][m+1],int i,int j){
+
+    if(i==n&&j==m){
+       return dp[i][j]=1; // There is one way if we match all characters
+    }
+    if(i==m||j==n){
+        return dp[i][j]=0;
+    }
+    int ans = 0;
+    ans+=findAnswer(source,target,n,m,dp,i+1,j,dp); //delete ith element
+    if(source[i] == target[j]){
+        ans+=findAnswer(source,target,n,m,dp,i+1,j+1,dp);
+    }
+    return dp[i][j] = ans;
+}
+
 
 int main(){
     int n,m;
     scanf("%d %d",&n,&m);
-    char source[n];
-    char target[m];
+    char source[n+1];
+    char target[m+1];
     scanf("%s",source);
     scanf("%s",target);
     // - No of ways to form target with source string
@@ -35,8 +51,8 @@ int main(){
             dp[i][j]=-1;
         }
     }
-    printf("%d",findSubsequence(source,target,n,m,dp));
-
+    printf("%d",findSubsequence(source,target,n,m,dp,0,0));
+    printf("%d",findAnswer(source,target,n,m,dp,0,0));
 
     return 0;
 }

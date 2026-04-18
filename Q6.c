@@ -10,9 +10,8 @@ int LPS(char* str,int l,int r,int n,int dp[n+1][n+1]){
         return 0;
     }
     if(l==r){
-        return 1;
+        return dp[l][r]=1;
     }
-    int ans = 0;
     if(str[l]==str[r]){ // length 2 bexause 2 characters matched and then recurse
         return dp[l][r] = 2+LPS(str,l+1,r-1,n,dp);
     }else{

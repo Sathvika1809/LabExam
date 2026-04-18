@@ -1,53 +1,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int findCrossing(int* pref,int l,int mid,int r,int lower,int upper){
+int mergeCount(int* pref,int* temp,int l,int r,int lower,int upper){
+    if(r-l<=1)return 0; //only one element
+
+    int mid = l+(r-l)/2;
     int cnt  = 0;
-    int sum = pref[mid];
-    for(int i=mid-1;i>=l;i++){
-        if(lower<=sum+pref[i]<=upper){
-            cnt++;
-            sum+=pref[i];
+    cnt+=mergeCount(pref,temp,l,mid,lower,upper);
+    cnt+=mergeCount(pref,temp,mid,r,lower,upper);
+    int j = mid,k = mid,t = mid;
+    int idx = l;
+
+    for(int i=l;i<mid;i++){
+        while(k<r && pref[k]-pref[i] < lower)k++;
+        while(j<r && pref[j]-pref[i]<=upper)j++;
+        cnt+=(j-k);
+
+        while (t < r && pref[t] < pref[i]) {
+            temp[idx++] = pref[t++];
         }
+        temp[idx++] = pref[i];
     }
-    for(int i=mid+1;i<=r;i++){
-        if(lower<=sum+pref[i]<=upper){
-            cnt++;
-            sum+=pref[i];
-        }
+
+    while (t < r) {
+        temp[idx++] = pref[t++];
+    }
+
+    for (int i = l; i < r; i++) {
+        pref[i] = temp[i];
     }
     return cnt;
-}
-
-int findPair(int* pref,int t,int lower,int upper){
-    int l = 0,r=t-1;
-    if(l==r && lower<=pref[l]<=upper){ //base case
-        return pref[l];
-    }else{
-        return 0;
     }
-    int leftSum=0;
-    int rightSum=0;
-    int crossing = 0;
-    if(l<r){
-        int mid = l+(r-l)/2;
-        leftSum +=findPair(pref,t,lower,upper);
-        rightSum +=findPair(pref,t,lower,upper);
-        crossing +=findCrossing(pref,l,mid,r,lower,upper);
-    }
-    return 0;
-}
 
-
-
-int find(int* a,int n,int lower,int upper){
+int find(int* a,int n,int lower,int upper,int* temp){
    
     int pref[n+1];
     pref[0] = 0;
     for(int i=0;i<n;i++){
         pref[i+1] = pref[i]+a[i];
     }
-    return findPair(pref,n+1,lower,upper);
+    
+    int ans = mergeCount(pref,temp,0,n+1,lower,upper);
+    return ans;
 
 }
 int main(){
@@ -57,13 +51,9 @@ int main(){
     for(int i=0;i<n;i++){
     scanf("%d",&a[i]);
     }
-    int cnt = 0;
-    int ans = find(a,n,lower,upper);
+    int temp[n+1];
+    int ans = find(a,n,lower,upper,temp);
     printf("%d\n",ans);
-
-
-
-
 
     return 0;
 }
